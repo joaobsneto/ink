@@ -83,6 +83,8 @@ namespace Ink
 
                 rulesAtLevel.Add(Line(AuthorWarning));
 
+                rulesAtLevel.Add(Line(Speech));
+
                 // Gather lines would be confused with multi-line block separators, like
                 // within a multi-line if statement
                 if (level > StatementLevel.InnerBlock) {

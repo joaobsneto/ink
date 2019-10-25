@@ -43,6 +43,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InkParser\InkParser_Speech.cs" />
+    <Compile Include="ParsedHierarchy\Speech.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CommandLineTool.cs" />
     <Compile Include="CharacterSet.cs" />
