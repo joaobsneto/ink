@@ -8,35 +8,56 @@ using System.Threading.Tasks;
 namespace Ink {
     internal partial class InkParser {
 
-        protected Speech  Speech() {
+        protected List<Parsed.Object> Speech() {
             Whitespace();
             string author = "";
             if (string.IsNullOrEmpty(ParseString("\""))) {
-                if (string.IsNullOrEmpty(ParseString("("))) {
-                    return null;
-                }
-                author = Parse(Identifier);
-                if (string.IsNullOrEmpty(ParseString(")"))) {
-                    Warning("Was this supposed to be a speech? Missing ')' after who is the speecher");
-                    return null;
-                }
+                author = Parse(UpperCaseIdentifier);
                 Whitespace();
                 ParseString(":");
                 Whitespace();
-                if (string.IsNullOrEmpty(ParseString("\""))) {
-                    return null;
-                }
             }
-            string content = ParseUntilCharactersFromString("\n\r");
+            if (string.IsNullOrEmpty(ParseString("\""))) {
+                return null;
+            }
+            string content = Parse(ContentTextNoEscape);
             if (content == null)
                 return null;
             int lastQuote = content.LastIndexOf('"');
             if (lastQuote < 0) {
-                Warning("Was this supposed to be a speech? Last quote is missing.");
+                Warning("Is it a speech? Quote is missing.");
                 return null;
             }
             content = content.Substring(0, lastQuote);
-            return new Speech(author, content);
+            return new List<Parsed.Object>() { new Speech(author, content), new Text("\n") };
+        }
+        private CharacterSet _upperCaseIdentifierCharSet;
+        protected string UpperCaseIdentifier() {
+            if (_upperCaseIdentifierCharSet == null) {
+                _upperCaseIdentifierCharSet = new CharacterSet();
+                _upperCaseIdentifierCharSet.AddRange('A', 'Z');
+                _upperCaseIdentifierCharSet.AddRange('0', '9');
+                _upperCaseIdentifierCharSet.Add('_');
+            }
+
+            // Parse remaining characters (if any)
+            var name = ParseCharactersFromCharSet(_upperCaseIdentifierCharSet);
+            if (name == null)
+                return null;
+
+            // Reject if it's just a number
+            bool isNumberCharsOnly = true;
+            foreach (var c in name) {
+                if (!(c >= '0' && c <= '9')) {
+                    isNumberCharsOnly = false;
+                    break;
+                }
+            }
+            if (isNumberCharsOnly) {
+                return null;
+            }
+
+            return name;
         }
 
     }

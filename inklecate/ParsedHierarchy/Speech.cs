@@ -21,7 +21,7 @@ namespace Ink.Parsed {
                 Warning($"Speech content exceeds {maxCharCount} char count.");
             }
             return new Runtime.StringValue((string.IsNullOrEmpty(author)) ? $"\"{speechContent}\"" : 
-                $"({author}):\"{speechContent}\"");
+                $"{author}:\"{speechContent}\"");
         }
     }
 }
