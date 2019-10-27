@@ -1,9 +1,5 @@
 ﻿using Ink.Parsed;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ink {
     internal partial class InkParser {

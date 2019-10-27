@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ink.Parsed {
+﻿namespace Ink.Parsed {
     internal class Speech : Parsed.Object {
         public string author;
         public string speechContent;
