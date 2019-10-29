@@ -1,31 +1,67 @@
 ﻿using Ink.Parsed;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Ink {
     internal partial class InkParser {
-
+        private const int maxCharCount = 100;
         protected List<Parsed.Object> Speech() {
             Whitespace();
             string author = "";
             if (string.IsNullOrEmpty(ParseString("\""))) {
                 author = Parse(UpperCaseIdentifier);
+                if (author == null) return null;
                 Whitespace();
-                ParseString(":");
+                if (ParseString(":") == null) return null;
                 Whitespace();
             }
             if (string.IsNullOrEmpty(ParseString("\""))) {
                 return null;
             }
-            string content = Parse(ContentTextNoEscape);
-            if (content == null)
-                return null;
-            int lastQuote = content.LastIndexOf('"');
-            if (lastQuote < 0) {
-                Warning("Is it a speech? Quote is missing.");
+           // string content = Parse(ContentTextNoEscape);
+            var parsedLine = Parse(MixedTextAndLogic);
+            if (parsedLine == null) {
                 return null;
             }
-            content = content.Substring(0, lastQuote);
-            return new List<Parsed.Object>() { new Speech(author, content), new Text("\n") };
+            StringBuilder sb = new StringBuilder();
+            Parsed.Object parsedLineElement;
+            Text parsedLineText;
+            int lastQuote;
+            bool hasFoundQuote = false;
+            int charCount = 0;
+            for (int i = parsedLine.Count-1; i >= 0; i--) {
+                parsedLineElement = parsedLine[i];
+                if (!(parsedLineElement is Text))
+                    continue;
+                parsedLineText = (Text)parsedLineElement;
+                charCount += parsedLineText.text.Length;
+                //search last quote
+                if (hasFoundQuote) continue;
+                lastQuote = parsedLineText.text.LastIndexOf("\"");
+                if (lastQuote < 0) {
+                    sb.Insert(0, parsedLineText.text.Trim());
+                } else {
+                    lastQuote++;
+                    if (lastQuote < parsedLineText.text.Length -1) {
+                        sb.Insert(0, parsedLineText.text.Substring(lastQuote, parsedLineText.text.Length - lastQuote).Trim());
+
+                    }
+                    hasFoundQuote = true;
+                }
+            }
+            if (!hasFoundQuote) {
+                Warning("Is it a speech? Last quote was not found");
+                return null;
+            }
+            if (sb.Length > 0) {
+                Warning("Is it a speech? There is content after last quote");
+                return null;
+            }
+            if (charCount > maxCharCount) {
+                Warning($"Speech exceeds character limits of {maxCharCount} characters");
+            }
+            return null;
         }
         private CharacterSet _upperCaseIdentifierCharSet;
         protected string UpperCaseIdentifier() {

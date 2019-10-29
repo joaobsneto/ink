@@ -27,7 +27,6 @@
   <ItemGroup>
     <Compile Include="InkParser\InkParser_Speech.cs" />
     <Compile Include="InkStringConversionExtensions.cs" />
-    <Compile Include="ParsedHierarchy\Speech.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ParsedHierarchy\AuthorWarning.cs" />
     <Compile Include="ParsedHierarchy\Choice.cs" />
